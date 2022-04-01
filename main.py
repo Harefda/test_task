@@ -18,20 +18,22 @@ from services import (
 # average_number_of_movies_per_actor = int
 
 
-def get_oldeset_actor(all_actors) -> Actor:
-    the_oldest_actor = all_actors[0]
-    for actor in all_actors:
-        if get_age(actor) > get_age(the_oldest_actor):
-            the_oldest_actor = actor
+def get_oldeset_actor(actors) -> Actor:
+    oldest_actor = actors[0]
+    for actor in actors:
+        if get_age(actor) > get_age(oldest_actor):
+            oldest_actor = actor
     
-    return the_oldest_actor
+    return oldest_actor
 
-def get_youngest_actor(all_actors) -> Actor:
-    the_youngest_actor = all_actors[0]
-    for actor in all_actors:
-        if get_age(actor) < get_age(the_youngest_actor):
-            the_youngest_actor = actor
+def get_youngest_actor(actors) -> Actor:
+    youngest_actor = actors[0]
+    for actor in actors:
+        if get_age(actor) < get_age(youngest_actor):
+            youngest_actor = actor
 
-    return the_youngest_actor
+    return youngest_actor
 
-print(get_oldeset_actor(get_all_actors()).name, get_age(get_oldeset_actor(get_all_actors())))
+def get_actor_with_biggest_filmography(actors):
+    actor_with_biggest_filmography = actors[0]
+    
