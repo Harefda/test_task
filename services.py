@@ -1,7 +1,12 @@
-import requests
+import requests, re
 
 from dateutil.relativedelta import relativedelta
-from datetime import datetime, date
+from dateutil.parser import parse
+from typing import Optional
+from datetime import (
+    datetime,
+    date
+)
 from pydantic import (
     BaseModel,
     validator
@@ -11,6 +16,7 @@ from pydantic import (
 class Actor(BaseModel):
     name: str
     dob: datetime
+    dod: Optional[datetime]
     gender: str
     movies: list[dict]
 
@@ -20,6 +26,13 @@ class Actor(BaseModel):
             return datetime.strptime(v, "%d-%m-%Y")
         return v
 
+    @validator("dod", pre=True, always=True)
+    def parse_dod(cls, v):
+        if isinstance(v, str) and len(re.findall("-", v)) == 2:
+            v = re.findall(r'\d{2}-\d{2}-\d{4}', v)[0]
+            return datetime.strptime(v, "%d-%m-%Y")
+
+print(Actor(name="Hello", dob="12-03-2922", dod="/n", gender="M", movies=[{}]))
 
 def get_all_actors():
     response = requests.get(
@@ -37,3 +50,5 @@ def get_current_date():
 
 def get_age(actor: Actor):
     return relativedelta(get_current_date(), actor.dob).years
+
+print(get_all_actors()[0].dob)
