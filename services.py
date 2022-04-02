@@ -32,7 +32,9 @@ class Actor(BaseModel):
             v = re.findall(r'\d{2}-\d{2}-\d{4}', v)[0]
             return datetime.strptime(v, "%d-%m-%Y")
 
-print(Actor(name="Hello", dob="12-03-2922", dod="/n", gender="M", movies=[{}]))
+    @validator("name", pre=True)
+    def parse_name(cls, v):
+        pass
 
 def get_all_actors():
     response = requests.get(
@@ -49,6 +51,6 @@ def get_current_date():
     return convert_str_to_date(current_date)
 
 def get_age(actor: Actor):
-    return relativedelta(get_current_date(), actor.dob).years
-
-print(get_all_actors()[0].dob)
+    if actor.dod is None:
+        return relativedelta(get_current_date(), actor.dob).years
+    return relativedelta(actor.dod, actor.dob).years
