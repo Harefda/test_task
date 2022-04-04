@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import requests, re
 
 from dateutil.relativedelta import relativedelta
@@ -9,16 +10,21 @@ from datetime import (
 )
 from pydantic import (
     BaseModel,
-    validator
+    validator,
 )
+
+
+class Movie(BaseModel):
+    title: str
+    year: Optional[str] = None
 
 
 class Actor(BaseModel):
     name: str
     dob: datetime
-    dod: Optional[datetime]
+    dod: Optional[datetime] = None
     gender: str
-    movies: list[dict]
+    movies: list[Movie]
 
     @validator("dob", pre=True)
     def parse_dob(cls, v):
@@ -26,15 +32,28 @@ class Actor(BaseModel):
             return datetime.strptime(v, "%d-%m-%Y")
         return v
 
-    @validator("dod", pre=True, always=True)
+    @validator("dod", pre=True)
     def parse_dod(cls, v):
         if isinstance(v, str) and len(re.findall("-", v)) == 2:
             v = re.findall(r'\d{2}-\d{2}-\d{4}', v)[0]
             return datetime.strptime(v, "%d-%m-%Y")
+        print("hello", v)
 
     @validator("name", pre=True)
     def parse_name(cls, v):
-        pass
+        final_name = ""
+        full_name = re.findall(r"[A-Z][a-z]+", " "+v)
+        for name in full_name:
+            final_name += name+" "
+        return final_name[0:-1]
+
+    @validator("movies", pre=True)
+    def parse_movies(cls, v):
+        for movie in v:
+            movie["title"] = parse_title(movie["title"])
+            movie["year"] = parse_year(movie)
+        return v
+
 
 def get_all_actors():
     response = requests.get(
@@ -54,3 +73,33 @@ def get_age(actor: Actor):
     if actor.dod is None:
         return relativedelta(get_current_date(), actor.dob).years
     return relativedelta(actor.dod, actor.dob).years
+
+def parse_title(title):
+    count=-1
+    parsed_string = ""
+    for i in title:
+        count+=1
+        if i != "/" and title[count-1] != "/":
+            parsed_string += i
+        else:
+            parsed_string += " "
+
+    parsed_string = parsed_string.split()
+    return " ".join(parsed_string)
+
+def parse_year(movie):
+    if "year" in movie.keys():
+        if not isinstance(movie["year"], str):
+            movie["year"] = str(movie["year"])
+        if isinstance(movie["year"], str):
+            year = movie["year"] = re.findall(r"\d+", movie["year"])
+            if len(year) == 0:
+                movie["year"] = None
+            else:
+                movie["year"] = year[0]
+    else:
+        movie["year"] = None
+    
+    return movie["year"]
+
+print(get_all_actors())

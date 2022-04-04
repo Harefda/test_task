@@ -17,14 +17,13 @@ from services import (
 # average_age_of_actors = int
 # average_number_of_movies_per_actor = int
 
-
 def get_oldeset_actor(actors) -> Actor:
     oldest_actor = actors[0]
     for actor in actors:
         if get_age(actor) > get_age(oldest_actor):
             oldest_actor = actor
     
-    return oldest_actor
+    return {"oldest_actor": oldest_actor.name, "age": get_age(oldest_actor)}
 
 def get_youngest_actor(actors) -> Actor:
     youngest_actor = actors[0]
@@ -32,10 +31,11 @@ def get_youngest_actor(actors) -> Actor:
         if get_age(actor) < get_age(youngest_actor):
             youngest_actor = actor
 
-    return youngest_actor
+    return {"youngest_actor": youngest_actor.name, "age": get_age(youngest_actor)}
 
 # def get_actor_with_biggest_filmography(actors):
 #     actor_with_biggest_filmography = actors[0]
 
 print(get_youngest_actor(get_all_actors()))
+print(get_oldeset_actor(get_all_actors()))
     
