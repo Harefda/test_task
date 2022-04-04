@@ -1,4 +1,4 @@
-import requests, re
+import requests, re, os
 
 from dateutil.relativedelta import relativedelta
 from dateutil.parser import parse
@@ -51,7 +51,7 @@ class Actor(BaseModel):
 def get_all_actors():
     response = requests.get(
         "https://synapsi.xyz/api/recruitment/dataset",
-        auth=("YaroslavSheshko220328", "e020bd1d191b11f4e374aee95a1b792a")
+        auth=(os.getenv("AUTH_LOGIN"), os.getenv("AUTH_PASSWORD"))
     ).json()
     return [Actor(**actor) for actor in response]
 

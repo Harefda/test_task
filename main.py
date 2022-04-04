@@ -5,6 +5,7 @@ from services import (
     Actor,
     get_current_date
 )
+import os
 
 
 def get_oldeset_actor(actors):
@@ -38,6 +39,8 @@ def get_oldest_movie(actors):
 # def get_actor_with_biggest_filmography(actors):
 #     actor_with_biggest_filmography = actors[0]
 
-print(get_youngest_actor(get_all_actors()))
-print(get_oldeset_actor(get_all_actors()))
-print(get_oldest_movie(get_all_actors()))
+# print(get_youngest_actor(get_all_actors()))
+# print(get_oldeset_actor(get_all_actors()))
+# print(get_oldest_movie(get_all_actors()))
+
+print(os.getenv("AUTH_PASSWORD"))
