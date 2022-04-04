@@ -31,7 +31,6 @@ class Actor(BaseModel):
         if isinstance(v, str) and len(re.findall("-", v)) == 2:
             v = re.findall(r'\d{2}-\d{2}-\d{4}', v)[0]
             return datetime.strptime(v, "%d-%m-%Y")
-        print("hello", v)
 
     @validator("name", pre=True)
     def parse_name(cls, v):
@@ -47,6 +46,7 @@ class Actor(BaseModel):
             movie["title"] = parse_title(movie)
             movie["year"] = parse_year(movie)
         return v
+
 
 def get_all_actors():
     response = requests.get(
@@ -90,11 +90,9 @@ def parse_year(movie):
                movie["year"] = None
             else:
                 movie["year"] = year[0]
-        if movie["year"] is not None and len(movie["year"]) !=4:
+        if movie["year"] is not None and len(movie["year"]) != 4:
             movie["year"] = None
     else:
         movie["year"] = None        
 
     return movie["year"]
-
-print(get_all_actors())
