@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 import requests, re
 
 from dateutil.relativedelta import relativedelta
@@ -14,17 +13,12 @@ from pydantic import (
 )
 
 
-class Movie(BaseModel):
-    title: str
-    year: Optional[str] = None
-
-
 class Actor(BaseModel):
     name: str
     dob: datetime
     dod: Optional[datetime] = None
     gender: str
-    movies: list[Movie]
+    movies: list[dict]
 
     @validator("dob", pre=True)
     def parse_dob(cls, v):
@@ -42,7 +36,7 @@ class Actor(BaseModel):
     @validator("name", pre=True)
     def parse_name(cls, v):
         final_name = ""
-        full_name = re.findall(r"[A-Z][a-z]+", " "+v)
+        full_name = re.findall(r"[A-Z][a-z]+", v)
         for name in full_name:
             final_name += name+" "
         return final_name[0:-1]
@@ -50,10 +44,9 @@ class Actor(BaseModel):
     @validator("movies", pre=True)
     def parse_movies(cls, v):
         for movie in v:
-            movie["title"] = parse_title(movie["title"])
+            movie["title"] = parse_title(movie)
             movie["year"] = parse_year(movie)
         return v
-
 
 def get_all_actors():
     response = requests.get(
@@ -74,12 +67,12 @@ def get_age(actor: Actor):
         return relativedelta(get_current_date(), actor.dob).years
     return relativedelta(actor.dod, actor.dob).years
 
-def parse_title(title):
+def parse_title(movie):
     count=-1
     parsed_string = ""
-    for i in title:
+    for i in movie["title"]:
         count+=1
-        if i != "/" and title[count-1] != "/":
+        if i != "/" and movie["title"][count-1] != "/":
             parsed_string += i
         else:
             parsed_string += " "
@@ -94,12 +87,14 @@ def parse_year(movie):
         if isinstance(movie["year"], str):
             year = movie["year"] = re.findall(r"\d+", movie["year"])
             if len(year) == 0:
-                movie["year"] = None
+               movie["year"] = None
             else:
                 movie["year"] = year[0]
+        if movie["year"] is not None and len(movie["year"]) !=4:
+            movie["year"] = None
     else:
-        movie["year"] = None
-    
+        movie["year"] = None        
+
     return movie["year"]
 
 print(get_all_actors())

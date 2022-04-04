@@ -68,8 +68,10 @@ def parse_movies(actor):
                 movie.year = None
             else:
                 movie.year = year[0]
+        if movie.year is not None and len(movie.year) !=4:
+            movie.year = None
 
-    return actor
+    return actor.movies
 
 def delete_stuff(string):
     count=-1
@@ -83,6 +85,3 @@ def delete_stuff(string):
 
     parsed_string = parsed_string.split()
     return " ".join(parsed_string)
-    
-
-print(parse_movies(actor))
