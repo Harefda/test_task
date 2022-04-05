@@ -1,46 +1,93 @@
+from webbrowser import get
 from services import (
     convert_str_to_date,
     get_age,
     get_all_actors,
     Actor,
-    get_current_date
+    get_current_date,
+    get_period_of_death
 )
-import os
 
 
-def get_oldeset_actor(actors):
+def get_all_answers(actors):
     oldest_actor = actors[0]
-    for actor in actors:
-        if get_age(actor) > get_age(oldest_actor):
-            oldest_actor = actor
-    
-    return {"oldest_actor": oldest_actor.name, "age": get_age(oldest_actor)}
-
-def get_youngest_actor(actors):
     youngest_actor = actors[0]
-    for actor in actors:
-        if get_age(actor) < get_age(youngest_actor):
-            youngest_actor = actor
-
-    return {"youngest_actor": youngest_actor.name, "age": get_age(youngest_actor)}
-
-def get_oldest_movie(actors):
+    actor_with_biggest_filmography = actors[0]
+    actor_dead_for_the_longest_period = actors[0]
+    oldest_movie_age = 0
+    count_films = 0
+    count_dead_actors = 0
+    count_alive_actors_age = 0
     current_year = get_current_date().year
     oldest_movie = ""
-    oldest_movie_age = 0
+
     for actor in actors:
-        for movie in actor.movies:
-            if movie["year"] is not None and current_year - int(movie["year"]) > oldest_movie_age:
-                oldest_movie = movie["title"]
-                oldest_movie_age = get_current_date().year - int(movie["year"])
+        oldest_actor = get_oldeset_actor(actor, oldest_actor)
+        youngest_actor = get_youngest_actor(actor, youngest_actor)
+        oldest_movie = get_oldest_movie(actor, current_year, oldest_movie, oldest_movie_age)[0]
+        oldest_movie_age = get_oldest_movie(actor, current_year, oldest_movie, oldest_movie_age)[1]
+        actor_with_biggest_filmography = get_actor_with_biggest_filmography(actor, actor_with_biggest_filmography, count_films)[0]
+        count_films = get_actor_with_biggest_filmography(actor, actor_with_biggest_filmography, count_films)[1]
+        actor_dead_for_the_longest_period = get_actor_dead_for_the_longest_period(actor, actor_dead_for_the_longest_period)
+        count_dead_actors = get_count_dead_actors(actor, count_dead_actors)
+        count_alive_actors_age = get_average_age_alive_actors(actor, count_alive_actors_age)
 
-    return oldest_movie
+    return {
+        "1": oldest_actor.name,
+        "2": youngest_actor.name,
+        "3": str(get_age(oldest_actor)),
+        "4": str(get_age(youngest_actor)),
+        "5": actor_with_biggest_filmography.name,
+        "6": actor_dead_for_the_longest_period.name,
+        "7": oldest_movie,
+        "8": None,
+        "9": str(count_dead_actors),
+        "10": str(count_alive_actors_age // len(actors)),
+        "11": str(count_films // len(actors))
+    }
 
-# def get_actor_with_biggest_filmography(actors):
-#     actor_with_biggest_filmography = actors[0]
+def get_oldeset_actor(actor, oldest_actor) -> Actor:
+    if get_age(actor) > get_age(oldest_actor):
+        oldest_actor = actor
+    return oldest_actor
 
-# print(get_youngest_actor(get_all_actors()))
-# print(get_oldeset_actor(get_all_actors()))
-# print(get_oldest_movie(get_all_actors()))
+def get_youngest_actor(actor, youngest_actor) -> Actor:
+    if get_age(actor) < get_age(youngest_actor):
+        youngest_actor = actor
+    return youngest_actor
 
-print(os.getenv("AUTH_PASSWORD"))
+def get_oldest_movie(
+    actor,
+    current_year,
+    oldest_movie,
+    oldest_movie_age
+):
+    for movie in actor.movies:
+        if movie["year"] is not None and current_year - int(movie["year"]) > oldest_movie_age:
+            oldest_movie = movie["title"]
+            oldest_movie_age = get_current_date().year - int(movie["year"])
+    return oldest_movie, oldest_movie_age
+
+def get_actor_with_biggest_filmography(actor, actor_with_biggest_filmography, count_films):
+    count_films+=len(actor.movies)
+    if len(actor.movies) > len(actor_with_biggest_filmography.movies):
+        return actor, count_films
+    return actor_with_biggest_filmography, count_films
+
+def get_actor_dead_for_the_longest_period(actor, actor_dead_for_the_longest_period) -> Actor:
+    if actor.dod is not None:
+        if get_period_of_death(actor) > get_period_of_death(actor_dead_for_the_longest_period):
+            return actor
+    return actor_dead_for_the_longest_period
+
+def get_count_dead_actors(actor, count_dead_actors):
+    if actor.dod is None:
+        count_dead_actors+=1
+    return count_dead_actors
+
+def get_average_age_alive_actors(actor, count_alive_actors_age):
+    if actor.dod is None:
+        count_alive_actors_age+=get_age(actor)
+    return count_alive_actors_age
+
+print(get_all_answers(get_all_actors()))

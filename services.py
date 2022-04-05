@@ -2,6 +2,7 @@ import requests, re, os
 
 from dateutil.relativedelta import relativedelta
 from dateutil.parser import parse
+from dotenv import load_dotenv
 from typing import Optional
 from datetime import (
     datetime,
@@ -12,6 +13,8 @@ from pydantic import (
     validator,
 )
 
+
+load_dotenv()
 
 class Actor(BaseModel):
     name: str
@@ -66,6 +69,9 @@ def get_age(actor: Actor):
     if actor.dod is None:
         return relativedelta(get_current_date(), actor.dob).years
     return relativedelta(actor.dod, actor.dob).years
+
+def get_period_of_death(actor: Actor):
+    return relativedelta(get_current_date(), actor.dod).years
 
 def parse_title(movie):
     count=-1
