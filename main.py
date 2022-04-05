@@ -1,9 +1,7 @@
-from webbrowser import get
 from services import (
-    convert_str_to_date,
+    Actor,
     get_age,
     get_all_actors,
-    Actor,
     get_current_date,
     get_period_of_death
 )

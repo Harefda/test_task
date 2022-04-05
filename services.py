@@ -1,7 +1,6 @@
 import requests, re, os
 
 from dateutil.relativedelta import relativedelta
-from dateutil.parser import parse
 from dotenv import load_dotenv
 from typing import Optional
 from datetime import (
