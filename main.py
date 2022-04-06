@@ -100,6 +100,8 @@ def get_actors_with_same_dob(actor, actors, actors_with_same_dob):
             actors_with_same_dob.append(nested_actor.name)
     return list(set(actors_with_same_dob))
 
+def send_answers(answers):
+    pass
 
 
 
